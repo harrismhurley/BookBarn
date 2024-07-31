@@ -20,11 +20,19 @@ const startApolloServer = async () => {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
+  // Logging the environment to verify NODE_ENV
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+
   if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/dist')));
+    const staticPath = path.join(__dirname, '../client/dist');
+    console.log('Serving static files from:', staticPath);
+
+    app.use(express.static(staticPath));
 
     app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+      const indexPath = path.join(staticPath, 'index.html');
+      console.log('Sending index.html from:', indexPath);
+      res.sendFile(indexPath);
     });
   }
 
@@ -42,21 +50,3 @@ const startApolloServer = async () => {
 
 // Calls the startApolloServer function to initialize the server
 startApolloServer();
-
-
-
-
-
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
-
-// // if we're in production, serve client/build as static assets
-// if (process.env.NODE_ENV === 'production') {
-//   app.use(express.static(path.join(__dirname, '../client/build')));
-// }
-
-// app.use(routes);
-
-// db.once('open', () => {
-//   app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
-// });
