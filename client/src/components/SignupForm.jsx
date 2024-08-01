@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-
-import { createUser } from '../utils/API';
+import { useMutation } from '@apollo/client';
+import { ADD_USER } from '../utils/mutations'; // Import your GraphQL mutation
 import Auth from '../utils/auth';
 
 const SignupForm = () => {
-  // set initial form state
+  // Set initial form state
   const [userFormData, setUserFormData] = useState({ username: '', email: '', password: '' });
-  // set state for form validation
+  // Set state for form validation
   const [validated] = useState(false);
-  // set state for alert
+  // Set state for alert
   const [showAlert, setShowAlert] = useState(false);
+
+  // Define the mutation
+  const [addUser] = useMutation(ADD_USER);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -20,7 +23,7 @@ const SignupForm = () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
-    // check if form has everything (as per react-bootstrap docs)
+    // Check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.preventDefault();
@@ -28,13 +31,12 @@ const SignupForm = () => {
     }
 
     try {
-      const response = await createUser(userFormData);
+      // Call the mutation
+      const { data } = await addUser({
+        variables: { ...userFormData }
+      });
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      const { token, user } = await response.json();
+      const { token, user } = data.addUser;
       console.log(user);
       Auth.login(token);
     } catch (err) {
@@ -53,7 +55,7 @@ const SignupForm = () => {
     <>
       {/* This is needed for the validation functionality above */}
       <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
-        {/* show alert if server response is bad */}
+        {/* Show alert if server response is bad */}
         <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
           Something went wrong with your signup!
         </Alert>
