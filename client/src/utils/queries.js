@@ -18,17 +18,35 @@ export const GET_USER = gql`
       id
       username
       email
+      savedBooks {
+        bookId
+        title
+        authors
+        description
+        image
+        link
+      }
+      bookCount
     }
   }
 `;
 
 // Query to get the current logged-in user's information
-export const ME = gql`
-  query Me {
+export const GET_ME = gql`
+  query me {
     me {
       id
       username
       email
+      savedBooks {
+        bookId
+        title
+        authors
+        description
+        image
+        link
+      }
+      bookCount
     }
   }
 `;
